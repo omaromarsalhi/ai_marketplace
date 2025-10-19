@@ -13,6 +13,13 @@ export interface Product {
   imageUrl?: string
   createdAt?: string
   updatedAt?: string
+  validationStatus?: 'pending' | 'approved' | 'rejected'
+  validationResult?: {
+    score: number
+    issues: string[]
+    imageDescription: string
+    reasoning: string
+  }
 }
 
 export const useProducts = () => {

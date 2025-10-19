@@ -1,4 +1,5 @@
 import { readData, updateItem, deleteItem, findById } from '~/server/utils/storage'
+import { validateProductWithAI, checkRequiredModels } from '~/server/utils/aiValidator'
 
 interface Product {
   id: string
@@ -10,6 +11,16 @@ interface Product {
   imageUrl?: string
   createdAt?: string
   updatedAt?: string
+  validationStatus?: 'pending' | 'approved' | 'rejected'
+  validationScore?: number
+  validationIssues?: string[]
+  aiDescription?: string
+  validationResult?: {
+    score: number
+    issues: string[]
+    imageDescription: string
+    reasoning: string
+  }
 }
 
 // Validation function for product updates
@@ -130,6 +141,14 @@ export default defineEventHandler(async (event) => {
         updateData.imageUrl = body.imageUrl.trim()
       }
 
+      // Reset validation status to pending for any product update to trigger AI re-validation
+      updateData.validationStatus = 'pending'
+      // Clear previous validation data to trigger fresh AI check
+      updateData.validationScore = undefined
+      updateData.validationIssues = undefined
+      updateData.aiDescription = undefined
+      console.log(`🔄 Product ${id} updated, resetting to pending for AI re-validation`)
+
       const updated = await updateItem<Product>('products.json', id, updateData)
 
       if (!updated) {
@@ -139,10 +158,61 @@ export default defineEventHandler(async (event) => {
         })
       }
 
+      // Start AI validation in background for updated product (non-blocking)
+      if (updated.imageUrl) {
+        console.log(`🚀 Starting AI validation for updated product: ${updated.id}`)
+        
+        // Check if required models are available
+        const modelsStatus = await checkRequiredModels()
+        
+        if (modelsStatus.vision && modelsStatus.text) {
+          // Run validation asynchronously without blocking the response
+          validateProductWithAI(
+            updated.name,
+            updated.description,
+            updated.imageUrl
+          ).then(async (validationResult) => {
+            // Update product with validation results
+            const products = await readData<Product>('products.json')
+            const productIndex = products.findIndex(p => p.id === updated.id)
+            
+            if (productIndex !== -1) {
+              const currentProduct = products[productIndex]
+              if (currentProduct) {
+                currentProduct.validationResult = {
+                  score: validationResult.score,
+                  issues: validationResult.issues,
+                  imageDescription: validationResult.imageDescription,
+                  reasoning: validationResult.reasoning
+                }
+                currentProduct.validationStatus = validationResult.isValid ? 'approved' : 'rejected'
+                
+                // Save updated products
+                const fs = await import('fs/promises')
+                const path = await import('path')
+                const dataDir = path.join(process.cwd(), 'server', 'data')
+                await fs.writeFile(
+                  path.join(dataDir, 'products.json'),
+                  JSON.stringify(products, null, 2)
+                )
+                
+                console.log(`✅ Updated product ${updated.id} validation complete: ${currentProduct.validationStatus}`)
+              }
+            }
+          }).catch((error) => {
+            console.error(`❌ Validation failed for updated product ${updated.id}:`, error.message)
+            // Optionally mark as rejected if validation fails
+          })
+        } else {
+          console.warn(`⚠️ Required models not available for product update validation (Vision: ${modelsStatus.vision}, Text: ${modelsStatus.text})`)
+          console.warn(`📝 ${modelsStatus.message}`)
+        }
+      }
+
       return {
         success: true,
         data: updated,
-        message: `Product "${updated.name}" updated successfully`
+        message: `Product "${updated.name}" updated successfully and sent for AI re-validation`
       }
     }
 

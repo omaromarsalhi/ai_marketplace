@@ -1,73 +1,74 @@
 <template>
   <div class="container">
-    <h1>About AI Marketplace</h1>
+    <h1>About Fresh Market</h1>
     
     <section class="content">
-      <h2>JSON Storage System</h2>
+      <h2>Our Fresh Market System</h2>
       <p>
-        This project uses a simple JSON file-based storage system instead of a traditional database. 
-        Perfect for prototyping, small applications, and scenarios where you don't need database complexity.
+        Welcome to Fresh Market - your trusted source for fresh vegetables and fruits! We use a simple and efficient 
+        JSON-based system to manage our products, ensuring quick access to our fresh produce inventory.
       </p>
 
-      <h2>How It Works</h2>
+      <h2>How Our System Works</h2>
       <div class="info-box">
-        <h3>📁 Storage Location</h3>
-        <p>All data is stored in <code>server/data/</code> directory as JSON files.</p>
+        <h3>🥬 Fresh Inventory</h3>
+        <p>Our produce catalog is efficiently managed and updated daily to ensure freshness.</p>
         
-        <h3>🔧 Utility Functions</h3>
-        <p>Located in <code>server/utils/storage.ts</code> with full CRUD operations:</p>
+        <h3>🔧 Management Features</h3>
+        <p>Our system provides comprehensive product management with:</p>
         <ul>
-          <li><strong>readData</strong> - Read all items from a JSON file</li>
-          <li><strong>writeData</strong> - Write items to a JSON file</li>
-          <li><strong>createItem</strong> - Create a new item with auto-generated ID</li>
-          <li><strong>updateItem</strong> - Update an existing item</li>
-          <li><strong>deleteItem</strong> - Delete an item by ID</li>
-          <li><strong>queryItems</strong> - Filter items with custom logic</li>
+          <li><strong>Browse</strong> - View all fresh vegetables and fruits</li>
+          <li><strong>Add</strong> - Add new produce to our catalog</li>
+          <li><strong>Update</strong> - Modify product details and pricing</li>
+          <li><strong>Remove</strong> - Remove out-of-season items</li>
+          <li><strong>Search</strong> - Find specific products quickly</li>
+          <li><strong>Filter</strong> - Browse by category (Fruits, Vegetables, Organic, etc.)</li>
         </ul>
 
-        <h3>🚀 API Endpoints</h3>
-        <p>RESTful APIs are available for:</p>
+        <h3>🌱 Product Categories</h3>
+        <p>We organize our fresh produce into categories:</p>
         <ul>
-          <li><code>GET/POST /api/products</code> - List and create products</li>
-          <li><code>GET/PUT/DELETE /api/products/:id</code> - Single product operations</li>
-          <li><code>GET/POST /api/users</code> - List and create users</li>
-          <li><code>GET /api/seed</code> - Populate with sample data</li>
+          <li><code>Fruits</code> - Fresh seasonal fruits</li>
+          <li><code>Vegetables</code> - Farm-fresh vegetables</li>
+          <li><code>Organic</code> - Certified organic produce</li>
+          <li><code>Seasonal</code> - Limited-time seasonal items</li>
+          <li><code>Exotic</code> - Unique and specialty produce</li>
         </ul>
       </div>
 
-      <h2>Advantages</h2>
+      <h2>Why Choose Fresh Market</h2>
       <div class="pros-cons">
         <div class="pros">
-          <h3>✅ Pros</h3>
+          <h3>✅ Benefits</h3>
           <ul>
-            <li>No database setup required</li>
-            <li>Easy to understand and debug</li>
-            <li>Version control friendly</li>
-            <li>Perfect for prototyping</li>
-            <li>No connection overhead</li>
-            <li>Human-readable data format</li>
+            <li>Daily fresh produce delivery</li>
+            <li>Easy online ordering system</li>
+            <li>Quality guaranteed products</li>
+            <li>Farm-to-table freshness</li>
+            <li>Competitive pricing</li>
+            <li>Wide variety of options</li>
           </ul>
         </div>
         <div class="cons">
-          <h3>⚠️ Considerations</h3>
+          <h3>🌱 Our Commitment</h3>
           <ul>
-            <li>Not suitable for large datasets</li>
-            <li>No concurrent write protection</li>
-            <li>Limited query capabilities</li>
-            <li>No built-in relationships</li>
-            <li>Entire file loaded into memory</li>
+            <li>Supporting local farmers</li>
+            <li>Sustainable farming practices</li>
+            <li>Organic certification</li>
+            <li>Seasonal variety rotation</li>
+            <li>Minimal environmental impact</li>
           </ul>
         </div>
       </div>
 
-      <h2>When to Use This Approach</h2>
+      <h2>Perfect for</h2>
       <ul class="use-cases">
-        <li>🎨 Rapid prototyping</li>
-        <li>📚 Small-scale applications</li>
-        <li>🧪 Testing and development</li>
-        <li>📖 Static or semi-static content</li>
-        <li>🎓 Learning projects</li>
-        <li>🔧 Configuration management</li>
+        <li>� Home cooking enthusiasts</li>
+        <li>🍽️ Restaurant and café owners</li>
+        <li>� Health-conscious individuals</li>
+        <li>👨‍👩‍👧‍� Families seeking fresh nutrition</li>
+        <li>� Organic lifestyle advocates</li>
+        <li>🍳 Professional chefs and caterers</li>
       </ul>
     </section>
   </div>
@@ -81,7 +82,7 @@
 }
 
 h1 {
-  color: #00DC82;
+  color: #22c55e;
   font-size: 3rem;
   margin-bottom: 2rem;
   text-align: center;
@@ -99,11 +100,11 @@ h2 {
   margin-top: 2rem;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #00DC82;
+  border-bottom: 2px solid #22c55e;
 }
 
 h3 {
-  color: #667eea;
+  color: #16a34a;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
@@ -119,14 +120,15 @@ code {
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
-  color: #00DC82;
+  color: #16a34a;
 }
 
 .info-box {
-  background: #f8f9fa;
+  background: #f0fdf4;
   padding: 2rem;
   border-radius: 8px;
   margin: 1rem 0;
+  border-left: 4px solid #22c55e;
 }
 
 ul {
@@ -153,11 +155,13 @@ li {
 }
 
 .pros {
-  background: #e8f5e9;
+  background: #dcfce7;
+  border-left: 4px solid #22c55e;
 }
 
 .cons {
-  background: #fff3e0;
+  background: #f0fdf4;
+  border-left: 4px solid #84cc16;
 }
 
 .use-cases {
@@ -170,11 +174,12 @@ li {
 }
 
 .use-cases li {
-  background: #f0f0f0;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
   padding: 1rem;
   border-radius: 8px;
   text-align: center;
   font-weight: 500;
-  color: #333;
+  color: #166534;
+  border: 1px solid #22c55e;
 }
 </style>

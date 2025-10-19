@@ -1,77 +1,62 @@
 <template>
-  <div>
-    <header>
-      <nav>
-        <div class="nav-brand">
-          <NuxtLink to="/">🤖 AI Marketplace</NuxtLink>
-        </div>
-        <div class="nav-links">
-          <NuxtLink to="/">Home</NuxtLink>
-          <NuxtLink to="/products">Products</NuxtLink>
-          <NuxtLink to="/about">About</NuxtLink>
+  <div class="min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-green-600 to-green-700 shadow-lg">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <NuxtLink to="/" class="text-white font-bold text-2xl hover:text-green-100 transition-colors flex items-center gap-2">
+              <Icon name="mdi:fruit-grapes" class="w-8 h-8" />
+              <span>Fresh Market</span>
+            </NuxtLink>
+          </div>
+          <div class="flex items-center gap-2">
+            <NuxtLink 
+              to="/" 
+              class="text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-all"
+              active-class="bg-white/30"
+            >
+              <Icon name="mdi:home" class="inline w-5 h-5 mr-1" />
+              Home
+            </NuxtLink>
+            <NuxtLink 
+              to="/products" 
+              class="text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-all"
+              active-class="bg-white/30"
+            >
+              <Icon name="mdi:food-apple" class="inline w-5 h-5 mr-1" />
+              Products
+            </NuxtLink>
+            <NuxtLink 
+              to="/products/manage" 
+              class="text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-all"
+              active-class="bg-white/30"
+            >
+              <Icon name="mdi:cog" class="inline w-5 h-5 mr-1" />
+              Manage
+            </NuxtLink>
+            <NuxtLink 
+              to="/about" 
+              class="text-white font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-all"
+              active-class="bg-white/30"
+            >
+              <Icon name="mdi:information" class="inline w-5 h-5 mr-1" />
+              About
+            </NuxtLink>
+          </div>
         </div>
       </nav>
     </header>
-    <main>
+    
+    <main class="flex-1 bg-gradient-to-br from-green-50 to-emerald-50">
       <slot />
     </main>
-    <footer>
-      <p>&copy; 2025 AI Marketplace - JSON Storage System</p>
+    
+    <footer class="mt-16 bg-gradient-to-r from-gray-100 to-gray-200 border-t-4 border-green-500">
+      <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-gray-600">
+          &copy; 2025 Fresh Market - Fresh vegetables and fruits delivered daily
+        </p>
+      </div>
     </footer>
   </div>
 </template>
-
-<style scoped>
-header {
-  background-color: #00DC82;
-  padding: 1rem 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-nav {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-brand a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.router-link-active {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-main {
-  min-height: calc(100vh - 200px);
-}
-
-footer {
-  margin-top: 4rem;
-  padding: 2rem;
-  text-align: center;
-  background-color: #f5f5f5;
-  border-top: 2px solid #00DC82;
-}
-</style>

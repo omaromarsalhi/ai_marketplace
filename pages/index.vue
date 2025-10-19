@@ -1,60 +1,100 @@
 <template>
   <div class="container">
     <section class="hero">
-      <h1>Welcome to AI Marketplace</h1>
-      <p class="tagline">Your one-stop shop for AI tools and services</p>
+      <h1>Welcome to Fresh Market</h1>
+      <p class="tagline">Your source for fresh vegetables and fruits</p>
       <div class="cta-buttons">
-        <NuxtLink to="/products" class="btn-primary">Browse Products</NuxtLink>
-        <button @click="checkApi" class="btn-secondary">Test API</button>
+        <NuxtLink to="/products/manage" class="btn-primary">Manage Products</NuxtLink>
+        <NuxtLink to="/about" class="btn-secondary">About Us</NuxtLink>
       </div>
     </section>
 
-    <section class="features">
-      <h2>Features</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="icon">📦</div>
-          <h3>JSON Storage</h3>
-          <p>Simple file-based storage without database complexity</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">⚡</div>
-          <h3>Fast & Light</h3>
-          <p>No database overhead, perfect for prototyping</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🔄</div>
-          <h3>Full CRUD</h3>
-          <p>Complete Create, Read, Update, Delete operations</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🛠️</div>
-          <h3>Easy to Use</h3>
-          <p>Utility functions for common data operations</p>
-        </div>
+    <!-- Category Filter -->
+    <section class="filters">
+      <div class="filter-buttons">
+        <button 
+          @click="selectedCategory = 'All'" 
+          :class="['filter-btn', { active: selectedCategory === 'All' }]">
+          All Products
+        </button>
+        <button 
+          v-for="category in categories" 
+          :key="category"
+          @click="selectedCategory = category" 
+          :class="['filter-btn', { active: selectedCategory === category }]">
+          {{ category }}
+        </button>
       </div>
     </section>
-    
-    <section v-if="apiResponse" class="api-section">
-      <h2>API Response</h2>
-      <div class="api-response">
-        <pre>{{ JSON.stringify(apiResponse, null, 2) }}</pre>
+
+    <!-- Products Grid -->
+    <section class="products-section">
+      <div v-if="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+      </div>
+
+      <div v-else-if="error" class="error">
+        <p>{{ error }}</p>
+        <button @click="fetchProducts" class="btn-primary">Retry</button>
+      </div>
+
+      <div v-else-if="filteredProducts.length === 0" class="empty">
+        <p>No products found in this category.</p>
+      </div>
+
+      <div v-else class="products-grid">
+        <div 
+          v-for="product in filteredProducts" 
+          :key="product.id" 
+          class="product-card">
+          <div class="product-image">
+            <img :src="product.imageUrl" :alt="product.name" />
+            <span class="category-badge">{{ product.category }}</span>
+          </div>
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="description">{{ product.description }}</p>
+            <div class="product-footer">
+              <div class="price">${{ product.price.toFixed(2) }}</div>
+              <div class="stock" :class="{ 'low-stock': product.stock < 50 }">
+                {{ product.stock }} in stock
+              </div>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-const apiResponse = ref(null)
+import { useProducts, type Product } from '~/composables/useProducts'
 
-const checkApi = async () => {
-  try {
-    const data = await $fetch('/api/hello')
-    apiResponse.value = data
-  } catch (error) {
-    apiResponse.value = { error: 'Failed to fetch API' }
+const { products, loading, error, fetchProducts } = useProducts()
+
+// Fetch products on mount
+onMounted(() => {
+  fetchProducts()
+})
+
+// Category filter
+const selectedCategory = ref('All')
+
+// Get unique categories from products
+const categories = computed(() => {
+  const uniqueCategories = [...new Set(products.value.map(p => p.category))].sort()
+  return uniqueCategories
+})
+
+// Filter products by category
+const filteredProducts = computed(() => {
+  if (selectedCategory.value === 'All') {
+    return products.value
   }
-}
+  return products.value.filter(p => p.category === selectedCategory.value)
+})
 </script>
 
 <style scoped>
@@ -67,10 +107,11 @@ const checkApi = async () => {
 .hero {
   text-align: center;
   padding: 4rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
   border-radius: 16px;
   color: white;
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
 }
 
 h1 {
@@ -88,6 +129,7 @@ h1 {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn-primary,
@@ -100,16 +142,18 @@ h1 {
   font-size: 1.1rem;
   border: none;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-block;
 }
 
 .btn-primary {
-  background: #00DC82;
-  color: white;
+  background: white;
+  color: #16a34a;
 }
 
 .btn-secondary {
-  background: white;
-  color: #667eea;
+  background: transparent;
+  color: white;
+  border: 2px solid white;
 }
 
 .btn-primary:hover,
@@ -118,76 +162,204 @@ h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.features {
-  margin: 4rem 0;
+/* Category Filters */
+.filters {
+  margin: 2rem 0;
 }
 
-.features h2 {
-  text-align: center;
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 3rem;
+.filter-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-}
-
-.feature-card {
+.filter-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  border: 2px solid #22c55e;
   background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #16a34a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover {
+  background: #f0fdf4;
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background: #22c55e;
+  color: white;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* Products Section */
+.products-section {
+  margin-top: 3rem;
+  min-height: 400px;
+}
+
+.loading,
+.error,
+.empty {
   text-align: center;
-  transition: transform 0.2s;
+  padding: 4rem 2rem;
 }
 
-.feature-card:hover {
-  transform: translateY(-4px);
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #22c55e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
 }
 
-.icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.feature-card h3 {
-  color: #00DC82;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+.error {
+  color: #dc2626;
 }
 
-.feature-card p {
+.empty {
   color: #666;
-  line-height: 1.6;
+  font-size: 1.2rem;
 }
 
-.api-section {
-  margin-top: 4rem;
+/* Products Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-.api-section h2 {
-  text-align: center;
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 2rem;
+.product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.api-response {
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 1rem;
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.2);
 }
 
-pre {
-  background-color: #1e1e1e;
-  color: #00DC82;
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.1);
+}
+
+.category-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(34, 197, 94, 0.95);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.product-info {
   padding: 1.5rem;
-  border-radius: 8px;
-  overflow-x: auto;
+}
+
+.product-info h3 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  min-height: 3rem;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.price {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.stock {
   font-size: 0.9rem;
-  line-height: 1.5;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.stock.low-stock {
+  color: #dc2626;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
+}
+
+.add-to-cart-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  .tagline {
+    font-size: 1.2rem;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   
+  // Modules
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxt/icon'
+  ],
+
   // TypeScript configuration
   typescript: {
     strict: true,
@@ -12,11 +18,11 @@ export default defineNuxtConfig({
   // App configuration
   app: {
     head: {
-      title: 'AI Marketplace',
+      title: 'Fresh Market',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'AI Marketplace - Your AI solutions platform' }
+        { name: 'description', content: 'Fresh Market - Your source for fresh vegetables and fruits' }
       ]
     }
   },

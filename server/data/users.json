@@ -1,0 +1,26 @@
+[
+  {
+    "id": "user-1",
+    "username": "admin",
+    "email": "admin@aimarketplace.com",
+    "fullName": "Admin User",
+    "role": "admin",
+    "createdAt": "2025-10-19T11:40:06.389Z"
+  },
+  {
+    "id": "user-2",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "fullName": "John Doe",
+    "role": "user",
+    "createdAt": "2025-10-19T11:40:06.389Z"
+  },
+  {
+    "id": "user-3",
+    "username": "janedoe",
+    "email": "jane@example.com",
+    "fullName": "Jane Doe",
+    "role": "user",
+    "createdAt": "2025-10-19T11:40:06.389Z"
+  }
+]

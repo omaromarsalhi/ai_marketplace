@@ -379,20 +379,25 @@
     }
   },
   {
-    "name": "Apples",
-    "description": "new fresh banan ready to be eaten",
-    "price": 10,
+    "name": "apple",
+    "description": "new bananas healthy and ready to be eaten",
+    "price": 41412,
     "category": "Fruits",
     "stock": 10,
-    "imageUrl": "/uploads/1760896043319-p745olq4s0a.png",
+    "imageUrl": "/uploads/1760891375310-0m7unbnyqp8f.png",
     "validationStatus": "rejected",
-    "id": "mgy02hvc-fau4tffxt",
-    "createdAt": "2025-10-19T17:48:13.944Z",
+    "id": "mgxx9doy-p2gyzo6yx",
+    "createdAt": "2025-10-19T16:29:36.274Z",
     "validationResult": {
       "score": 0,
-      "issues": [],
-      "imageDescription": " The image shows a bunch of bananas against a white background, placed side by side for display purposes. These bananas are ripe, with their yellow color indicating they are ready to eat. They appear in good condition, without any visible bruises or damage. There's no packaging on the bananas themselves; however, there is a watermark-like image of what seems to be a brand name, \"CHIK\", superimposed on the image of the bananas, which might indicate the brand associated with these bananas. The watermark is located at the top right corner of the image and includes an arrow pointing upwards. ",
-      "reasoning": "The title does not match the image content. The product title 'Apples' does not represent what's in the image, which shows bananas."
-    }
+      "issues": [
+        "Title does not match the image content",
+        "Description contains multiple instances of 'apple', but the image shows bananas",
+        "No packaging or branding visible in the image, which is inconsistent with a packaged product"
+      ],
+      "imageDescription": " The product in the image is a bunch of ripe bananas with a yellow hue indicating their stage of ripeness. They are whole and show no signs of damage or decay. There are six bananas clearly visible, arranged in a line against a white background that highlights their vibrant color. The bananas have a smooth texture typical for fruits and vegetables, and there is no packaging visible in the image, indicating they may be ready for consumption or sale. No text or branding is discernible from this image. ",
+      "reasoning": "The title and description do not accurately represent the image content. The image clearly shows ripe bananas, while the title and description suggest an apple. Additionally, the lack of packaging or branding in the image contradicts the expectation for a packaged product."
+    },
+    "updatedAt": "2025-10-19T16:33:31.765Z"
   }
 ]

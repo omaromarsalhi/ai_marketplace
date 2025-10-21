@@ -41,7 +41,7 @@
     <div v-else>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
         <div 
-          v-for="product in products"
+          v-for="product in paginatedProducts"
           :key="product.id"
           class="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
         >
@@ -89,6 +89,76 @@
         </div>
       </div>
 
+      <!-- Pagination -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <!-- Page Info -->
+          <div class="text-sm text-gray-600">
+            Showing 
+            <strong class="text-gray-900">{{ startIndex + 1 }}</strong> to 
+            <strong class="text-gray-900">{{ Math.min(endIndex, products.length) }}</strong> of 
+            <strong class="text-gray-900">{{ products.length }}</strong> products
+          </div>
+
+          <!-- Page Controls -->
+          <div class="flex items-center gap-2">
+            <button
+              @click="currentPage = 1"
+              :disabled="currentPage === 1"
+              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              :class="currentPage === 1 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
+            >
+              First
+            </button>
+            <button
+              @click="currentPage--"
+              :disabled="currentPage === 1"
+              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              :class="currentPage === 1 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
+            >
+              <Icon name="mdi:chevron-left" class="w-5 h-5" />
+            </button>
+
+            <span class="px-4 py-2 text-sm font-medium text-gray-700">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+
+            <button
+              @click="currentPage++"
+              :disabled="currentPage === totalPages"
+              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              :class="currentPage === totalPages ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
+            >
+              <Icon name="mdi:chevron-right" class="w-5 h-5" />
+            </button>
+            <button
+              @click="currentPage = totalPages"
+              :disabled="currentPage === totalPages"
+              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              :class="currentPage === totalPages ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
+            >
+              Last
+            </button>
+          </div>
+
+          <!-- Items per page -->
+          <div class="flex items-center gap-2">
+            <label for="itemsPerPage" class="text-sm text-gray-600">Per page:</label>
+            <select
+              id="itemsPerPage"
+              v-model="itemsPerPage"
+              class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option :value="8">8</option>
+              <option :value="12">12</option>
+              <option :value="16">16</option>
+              <option :value="24">24</option>
+              <option :value="32">32</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <!-- Stats -->
       <div class="bg-gray-100 rounded-xl p-6 text-center">
         <p class="text-gray-700">
@@ -124,6 +194,31 @@ const { data, pending, error, refresh } = await useFetch<{
 }>('/api/products')
 
 const products = computed(() => data.value?.data || [])
+
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = ref(12)
+
+const totalPages = computed(() => 
+  Math.ceil(products.value.length / itemsPerPage.value)
+)
+
+const startIndex = computed(() => 
+  (currentPage.value - 1) * itemsPerPage.value
+)
+
+const endIndex = computed(() => 
+  startIndex.value + itemsPerPage.value
+)
+
+const paginatedProducts = computed(() => 
+  products.value.slice(startIndex.value, endIndex.value)
+)
+
+// Reset to page 1 when items per page changes
+watch(itemsPerPage, () => {
+  currentPage.value = 1
+})
 
 const seedData = async () => {
   try {

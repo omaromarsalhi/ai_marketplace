@@ -377,22 +377,5 @@
       "imageDescription": "Here is a detailed description of the product image:\n\n**Product:** The product is a single apple.\n\n**Color:** The apple displays a blend of red and yellow coloring. The red is dominant, with mottled patches and streaks of yellow visible throughout the skin.\n\n**Texture:** The texture of the apple appears smooth and slightly shiny. It has a natural, unblemished appearance.\n\n**Condition:** The apple appears to be in good condition, with no visible bruising or damage. It has a firm, round shape.\n\n**Packaging:** There is no visible packaging around the apple. It is presented as a standalone item.\n\n**Text/Branding:** There is no visible text or branding on the apple or in the surrounding area.\n",
       "reasoning": "The title 'red apple' accurately represents the image content. The description 'a fruit called apple and its color is red' also matches the image, as it describes the dominant red color with yellow patches. No inconsistencies were found."
     }
-  },
-  {
-    "name": "Apples",
-    "description": "new fresh banan ready to be eaten",
-    "price": 10,
-    "category": "Fruits",
-    "stock": 10,
-    "imageUrl": "/uploads/1760896043319-p745olq4s0a.png",
-    "validationStatus": "rejected",
-    "id": "mgy02hvc-fau4tffxt",
-    "createdAt": "2025-10-19T17:48:13.944Z",
-    "validationResult": {
-      "score": 0,
-      "issues": [],
-      "imageDescription": " The image shows a bunch of bananas against a white background, placed side by side for display purposes. These bananas are ripe, with their yellow color indicating they are ready to eat. They appear in good condition, without any visible bruises or damage. There's no packaging on the bananas themselves; however, there is a watermark-like image of what seems to be a brand name, \"CHIK\", superimposed on the image of the bananas, which might indicate the brand associated with these bananas. The watermark is located at the top right corner of the image and includes an arrow pointing upwards. ",
-      "reasoning": "The title does not match the image content. The product title 'Apples' does not represent what's in the image, which shows bananas."
-    }
   }
 ]

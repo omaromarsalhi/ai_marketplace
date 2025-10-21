@@ -1,4 +1,5 @@
 import { readData, createItem } from '~/server/utils/storage'
+import { validateProductWithAI, checkOllamaHealth, checkRequiredModels } from '~/server/utils/aiValidator'
 
 interface Product {
   id?: string
@@ -10,6 +11,13 @@ interface Product {
   imageUrl?: string
   createdAt?: string
   updatedAt?: string
+  validationStatus?: 'pending' | 'approved' | 'rejected'
+  validationResult?: {
+    score: number
+    issues: string[]
+    imageDescription: string
+    reasoning: string
+  }
 }
 
 // Validation function for product data
@@ -147,13 +155,14 @@ export default defineEventHandler(async (event) => {
       }
       
       // Sanitize and format data
-      const productData = {
+      const productData: any = {
         name: body.name.trim(),
         description: body.description.trim(),
         price: Number(body.price),
         category: body.category.trim(),
         stock: Number(body.stock),
-        imageUrl: body.imageUrl?.trim() || ''
+        imageUrl: body.imageUrl?.trim() || '',
+        validationStatus: 'pending'
       }
       
       // Check for duplicate product names
@@ -169,12 +178,69 @@ export default defineEventHandler(async (event) => {
         })
       }
       
+      // Create product first with pending status
       const newProduct = await createItem<Product>('products.json', productData)
+      
+      // Start AI validation in background (non-blocking)
+      if (productData.imageUrl) {
+        console.log(`🚀 Starting AI validation for product: ${newProduct.id}`)
+        
+        // Check if required models are available
+        const modelsStatus = await checkRequiredModels()
+        
+        if (modelsStatus.vision && modelsStatus.text) {
+          // Run validation asynchronously without blocking the response
+          validateProductWithAI(
+            productData.name,
+            productData.description,
+            productData.imageUrl
+          ).then(async (validationResult) => {
+            // Update product with validation results
+            const products = await readData<Product>('products.json')
+            const productIndex = products.findIndex(p => p.id === newProduct.id)
+            
+            if (productIndex !== -1) {
+              const currentProduct = products[productIndex]
+              if (currentProduct) {
+                currentProduct.validationResult = {
+                  score: validationResult.score,
+                  issues: validationResult.issues,
+                  imageDescription: validationResult.imageDescription,
+                  reasoning: validationResult.reasoning
+                }
+                currentProduct.validationStatus = validationResult.isValid ? 'approved' : 'rejected'
+                
+                // Save updated products
+                const fs = await import('fs/promises')
+                const path = await import('path')
+                const dataDir = path.join(process.cwd(), 'server', 'data')
+                await fs.writeFile(
+                  path.join(dataDir, 'products.json'),
+                  JSON.stringify(products, null, 2)
+                )
+                
+                console.log(`✅ Product ${newProduct.id} validation complete: ${currentProduct.validationStatus}`)
+              }
+            }
+          }).catch((error) => {
+            console.error(`❌ Validation failed for product ${newProduct.id}:`, error.message)
+            // Optionally mark as rejected if validation fails
+          })
+        } else {
+          if (!modelsStatus.vision || !modelsStatus.text) {
+            console.warn(`⚠️ Required models not available (Vision: ${modelsStatus.vision}, Text: ${modelsStatus.text}). Product will remain in pending status.`)
+            console.warn(`📝 ${modelsStatus.message}`)
+          }
+        }
+      } else {
+        // No image, auto-approve (or you can reject)
+        productData.validationStatus = 'approved'
+      }
       
       return {
         success: true,
         data: newProduct,
-        message: `Product "${newProduct.name}" created successfully`
+        message: `Product "${newProduct.name}" created successfully and is being validated by AI`
       }
     } catch (error: any) {
       if (error.statusCode) {

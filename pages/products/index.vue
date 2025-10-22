@@ -6,14 +6,53 @@
         <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Fresh Market</h1>
         <p class="text-gray-600 mt-2">Browse our fresh vegetables and fruits collection</p>
       </div>
-      <NuxtLink 
-        to="/products/manage"
-        class="btn btn-primary shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center gap-2"
-      >
-        <Icon name="mdi:cog" class="w-5 h-5" />
-        Manage Products
-      </NuxtLink>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <NuxtLink 
+            to="/products/manage"
+            class="btn btn-primary shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center gap-2"
+          >
+            <Icon name="mdi:cog" class="w-5 h-5" />
+            Manage Products
+          </NuxtLink>
+        </div>
     </div>
+
+      <!-- AI Search -->
+      <div class="mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <input
+            v-model="aiPrompt"
+            type="text"
+            placeholder="Ex: je veux des fruits exotiques pas chers"
+            class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-200"
+            :disabled="aiLoading"
+          />
+
+          <div class="flex items-center gap-2 mt-3 sm:mt-0">
+            <button
+              @click="searchWithAI"
+              :disabled="aiLoading || !aiPrompt.trim()"
+              class="btn btn-primary inline-flex items-center gap-2"
+            >
+              <Icon name="mdi:magnify" class="w-4 h-4" />
+              <span v-if="!aiLoading">🔍 Rechercher avec IA</span>
+              <span v-else class="flex items-center gap-2">
+                <Icon name="mdi:loading" class="w-4 h-4 animate-spin" />
+                Recherche en cours...
+              </span>
+            </button>
+
+            <button
+              @click="resetAI"
+              :disabled="aiLoading"
+              class="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-lg"
+            >
+              🔄 Réinitialiser
+            </button>
+          </div>
+        </div>
+        <p v-if="aiError" class="text-sm text-red-600 mt-2">{{ aiError }}</p>
+      </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="text-center py-16">
@@ -27,7 +66,7 @@
       <p class="text-red-700">Error loading products: {{ error.message }}</p>
     </div>
 
-    <!-- Empty State -->
+    <!-- Empty State (no products at all) -->
     <div v-else-if="products.length === 0" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
       <Icon name="mdi:package-variant" class="w-20 h-20 text-gray-300 mx-auto mb-4" />
       <p class="text-gray-600 mb-4">No products found.</p>
@@ -37,11 +76,20 @@
       </button>
     </div>
 
+    <!-- AI-filtered No Results -->
+    <div v-else-if="filteredProducts !== null && filteredProducts.length === 0" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+      <Icon name="mdi:alert-circle-outline" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+      <p class="text-gray-600 mb-4">Aucun produit ne correspond à votre recherche IA.</p>
+      <button @click="resetAI" class="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-lg">
+        🔄 Réinitialiser
+      </button>
+    </div>
+
     <!-- Products Grid -->
     <div v-else>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
         <div 
-          v-for="product in paginatedProducts"
+          v-for="product in (filteredProducts !== null ? filteredProducts : products)"
           :key="product.id"
           class="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
         >
@@ -89,76 +137,6 @@
         </div>
       </div>
 
-      <!-- Pagination -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <!-- Page Info -->
-          <div class="text-sm text-gray-600">
-            Showing 
-            <strong class="text-gray-900">{{ startIndex + 1 }}</strong> to 
-            <strong class="text-gray-900">{{ Math.min(endIndex, products.length) }}</strong> of 
-            <strong class="text-gray-900">{{ products.length }}</strong> products
-          </div>
-
-          <!-- Page Controls -->
-          <div class="flex items-center gap-2">
-            <button
-              @click="currentPage = 1"
-              :disabled="currentPage === 1"
-              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              :class="currentPage === 1 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
-            >
-              First
-            </button>
-            <button
-              @click="currentPage--"
-              :disabled="currentPage === 1"
-              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              :class="currentPage === 1 ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
-            >
-              <Icon name="mdi:chevron-left" class="w-5 h-5" />
-            </button>
-
-            <span class="px-4 py-2 text-sm font-medium text-gray-700">
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
-
-            <button
-              @click="currentPage++"
-              :disabled="currentPage === totalPages"
-              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              :class="currentPage === totalPages ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
-            >
-              <Icon name="mdi:chevron-right" class="w-5 h-5" />
-            </button>
-            <button
-              @click="currentPage = totalPages"
-              :disabled="currentPage === totalPages"
-              class="px-3 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              :class="currentPage === totalPages ? 'border-gray-200 text-gray-400' : 'border-gray-300 text-gray-700'"
-            >
-              Last
-            </button>
-          </div>
-
-          <!-- Items per page -->
-          <div class="flex items-center gap-2">
-            <label for="itemsPerPage" class="text-sm text-gray-600">Per page:</label>
-            <select
-              id="itemsPerPage"
-              v-model="itemsPerPage"
-              class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option :value="8">8</option>
-              <option :value="12">12</option>
-              <option :value="16">16</option>
-              <option :value="24">24</option>
-              <option :value="32">32</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
       <!-- Stats -->
       <div class="bg-gray-100 rounded-xl p-6 text-center">
         <p class="text-gray-700">
@@ -195,30 +173,14 @@ const { data, pending, error, refresh } = await useFetch<{
 
 const products = computed(() => data.value?.data || [])
 
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(12)
+// AI search state
+const aiPrompt = ref('')
+const aiLoading = ref(false)
+const aiError = ref('')
+const filteredProducts = ref<Product[] | null>(null)
 
-const totalPages = computed(() => 
-  Math.ceil(products.value.length / itemsPerPage.value)
-)
-
-const startIndex = computed(() => 
-  (currentPage.value - 1) * itemsPerPage.value
-)
-
-const endIndex = computed(() => 
-  startIndex.value + itemsPerPage.value
-)
-
-const paginatedProducts = computed(() => 
-  products.value.slice(startIndex.value, endIndex.value)
-)
-
-// Reset to page 1 when items per page changes
-watch(itemsPerPage, () => {
-  currentPage.value = 1
-})
+// Configurable AI endpoint
+const aiEndpoint = ref('http://127.0.0.1:8000/api/ai-filter')
 
 const seedData = async () => {
   try {
@@ -227,5 +189,47 @@ const seedData = async () => {
   } catch (err) {
     console.error('Failed to seed data:', err)
   }
+}
+
+// Search with AI backend
+async function searchWithAI() {
+  const prompt = aiPrompt.value?.trim()
+  if (!prompt) return
+
+  aiLoading.value = true
+  aiError.value = ''
+  
+  try {
+    const response = await $fetch<{ items: Product[] }>(aiEndpoint.value, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: { 
+        prompt: prompt,
+        limit: 10 
+      }
+    })
+
+    // Extract products from response
+    if (response && Array.isArray(response.items)) {
+      filteredProducts.value = response.items
+    } else if (Array.isArray(response)) {
+      filteredProducts.value = response
+    } else {
+      aiError.value = 'Format de réponse inattendu du serveur IA.'
+      filteredProducts.value = []
+    }
+  } catch (err: any) {
+    console.error('AI search failed:', err)
+    aiError.value = err?.message || 'Erreur lors de la recherche IA. Vérifiez que le serveur est démarré.'
+    filteredProducts.value = []
+  } finally {
+    aiLoading.value = false
+  }
+}
+
+function resetAI() {
+  aiPrompt.value = ''
+  aiError.value = ''
+  filteredProducts.value = null
 }
 </script>

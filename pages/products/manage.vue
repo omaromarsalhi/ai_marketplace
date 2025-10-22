@@ -21,13 +21,13 @@
           <Icon name="mdi:robot" class="w-5 h-5" />
           AI Validation
         </NuxtLink>
-        <button 
-          @click="openCreateModal" 
+        <NuxtLink 
+          to="/products/add"
           class="btn btn-primary shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center gap-2"
         >
           <Icon name="mdi:plus-circle" class="w-5 h-5" />
           Add Product
-        </button>
+        </NuxtLink>
       </div>
     </div>
 
@@ -133,10 +133,10 @@
       <Icon name="mdi:package-variant" class="w-20 h-20 text-gray-300 mx-auto mb-4" />
       <h2 class="text-2xl font-semibold text-gray-900 mb-2">No Products Yet</h2>
       <p class="text-gray-600 mb-6">Start by adding your first product to the marketplace</p>
-      <button @click="openCreateModal" class="btn btn-primary inline-flex items-center gap-2">
+      <NuxtLink to="/products/add" class="btn btn-primary inline-flex items-center gap-2">
         <Icon name="mdi:plus" class="w-5 h-5" />
         Add Your First Product
-      </button>
+      </NuxtLink>
     </div>
 
     <!-- No Results State -->
@@ -248,13 +248,13 @@
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-2">
-                  <button 
-                    @click="openEditModal(product)" 
+                  <NuxtLink 
+                    :to="`/products/add?edit=${product.id}`"
                     class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="Edit product"
                   >
                     <Icon name="mdi:pencil" class="w-5 h-5" />
-                  </button>
+                  </NuxtLink>
                   <button 
                     @click="confirmDelete(product)" 
                     class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -346,15 +346,6 @@
       </div>
     </div>
 
-    <!-- Product Form Modal -->
-    <ProductForm
-      :show="showForm"
-      :product="editingProduct"
-      :loading="formLoading"
-      @close="closeForm"
-      @submit="handleFormSubmit"
-    />
-
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
       :show="showDeleteDialog"
@@ -397,11 +388,8 @@ const toast = useToast()
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const sortBy = ref('name')
-const showForm = ref(false)
 const showDeleteDialog = ref(false)
-const editingProduct = ref<Product | null>(null)
 const productToDelete = ref<Product | null>(null)
-const formLoading = ref(false)
 const aiHealth = ref<any>(null)
 
 onMounted(async () => {
@@ -533,44 +521,6 @@ const clearFilters = () => {
   searchQuery.value = ''
   selectedCategory.value = ''
   sortBy.value = 'name'
-}
-
-const openCreateModal = () => {
-  editingProduct.value = null
-  showForm.value = true
-}
-
-const openEditModal = (product: any) => {
-  editingProduct.value = { ...product } as Product
-  showForm.value = true
-}
-
-const closeForm = () => {
-  showForm.value = false
-  editingProduct.value = null
-}
-
-const handleFormSubmit = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-  formLoading.value = true
-  
-  try {
-    let success = false
-
-    if (editingProduct.value?.id) {
-      success = await updateProduct(editingProduct.value.id, productData)
-    } else {
-      success = await createProduct(productData)
-    }
-
-    if (success) {
-      closeForm()
-      if (!editingProduct.value?.id && productData.imageUrl) {
-        toast.success('Product created! AI validation in progress...')
-      }
-    }
-  } finally {
-    formLoading.value = false
-  }
 }
 
 const confirmDelete = (product: any) => {

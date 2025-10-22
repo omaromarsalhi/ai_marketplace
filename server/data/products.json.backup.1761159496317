@@ -342,26 +342,6 @@
     }
   },
   {
-    "name": "banana",
-    "description": "banana banana banana",
-    "price": 4100,
-    "category": "Fruits",
-    "stock": 10,
-    "imageUrl": "/uploads/1760887753383-43adu3tay1u.jpeg",
-    "validationStatus": "rejected",
-    "id": "mgxv3qvt-6cldm4sva",
-    "createdAt": "2025-10-19T15:29:14.201Z",
-    "validationResult": {
-      "score": 0,
-      "issues": [
-        "Title does not match the image content",
-        "Description contains irrelevant information (banana) instead of apple"
-      ],
-      "imageDescription": "Here's a detailed and objective description of the product image:\n\n**Product:** The product is a single apple.\n\n**Color:** The apple is predominantly a deep red color, with areas of yellowish-orange visible, creating a mottled or speckled effect across its surface.\n\n**Texture:** The surface of the apple appears smooth and slightly shiny. There are no visible blemishes or imperfections.\n\n**Condition:** The apple appears to be in good condition.\n\n**Packaging:** There is no visible packaging. The apple is presented as a standalone item.\n\n**Visible Text/Branding:** There is no visible text or branding on the apple.\n",
-      "reasoning": "The title and description do not accurately represent the product in the image. The title mentions 'banana' which is not present in the image, and the description contains multiple instances of 'banana' despite showing an apple."
-    }
-  },
-  {
     "name": "red apple",
     "description": "a fruit called  apple and its color is red",
     "price": 10,

@@ -342,26 +342,6 @@
     }
   },
   {
-    "name": "banana",
-    "description": "banana banana banana",
-    "price": 4100,
-    "category": "Fruits",
-    "stock": 10,
-    "imageUrl": "/uploads/1760887753383-43adu3tay1u.jpeg",
-    "validationStatus": "rejected",
-    "id": "mgxv3qvt-6cldm4sva",
-    "createdAt": "2025-10-19T15:29:14.201Z",
-    "validationResult": {
-      "score": 0,
-      "issues": [
-        "Title does not match the image content",
-        "Description contains irrelevant information (banana) instead of apple"
-      ],
-      "imageDescription": "Here's a detailed and objective description of the product image:\n\n**Product:** The product is a single apple.\n\n**Color:** The apple is predominantly a deep red color, with areas of yellowish-orange visible, creating a mottled or speckled effect across its surface.\n\n**Texture:** The surface of the apple appears smooth and slightly shiny. There are no visible blemishes or imperfections.\n\n**Condition:** The apple appears to be in good condition.\n\n**Packaging:** There is no visible packaging. The apple is presented as a standalone item.\n\n**Visible Text/Branding:** There is no visible text or branding on the apple.\n",
-      "reasoning": "The title and description do not accurately represent the product in the image. The title mentions 'banana' which is not present in the image, and the description contains multiple instances of 'banana' despite showing an apple."
-    }
-  },
-  {
     "name": "red apple",
     "description": "a fruit called  apple and its color is red",
     "price": 10,
@@ -379,25 +359,21 @@
     }
   },
   {
-    "name": "bananas",
-    "description": "new bananas healthy and ready to be eaten",
-    "price": 41412,
+    "name": "apple",
+    "description": "Indulge in the crunch and sweetness of our fresh red apple, carefully selected for its vibrant appearance and smooth texture. With its predominantly red skin and yellow highlights, this apple is not only a treat for the eyes but also a delight for the taste buds. Enjoy it as a healthy snack on its own or add it to your favorite recipes for a burst of freshness and flavor. Our apple is free from visible bruises or blemishes, ensuring you get the best quality every time.",
+    "price": 10,
     "category": "Fruits",
     "stock": 10,
-    "imageUrl": "/uploads/1760891375310-0m7unbnyqp8f.png",
-    "validationStatus": "pending",
-    "id": "mgxx9doy-p2gyzo6yx",
-    "createdAt": "2025-10-19T16:29:36.274Z",
+    "imageUrl": "/uploads/1761162063735-swzwk58rd6.jpeg",
+    "validationStatus": "approved",
+    "id": "mh2efo8i-dggugdnnr",
+    "createdAt": "2025-10-22T19:41:28.050Z",
     "validationResult": {
-      "score": 0,
-      "issues": [
-        "Title does not match the image content",
-        "Description contains multiple instances of 'apple', but the image shows bananas",
-        "No packaging or branding visible in the image, which is inconsistent with a packaged product"
-      ],
-      "imageDescription": " The product in the image is a bunch of ripe bananas with a yellow hue indicating their stage of ripeness. They are whole and show no signs of damage or decay. There are six bananas clearly visible, arranged in a line against a white background that highlights their vibrant color. The bananas have a smooth texture typical for fruits and vegetables, and there is no packaging visible in the image, indicating they may be ready for consumption or sale. No text or branding is discernible from this image. ",
-      "reasoning": "The title and description do not accurately represent the image content. The image clearly shows ripe bananas, while the title and description suggest an apple. Additionally, the lack of packaging or branding in the image contradicts the expectation for a packaged product."
+      "score": 95,
+      "issues": [],
+      "imageDescription": "The product in the image is a single apple. The apple is primarily red with yellow highlights and vertical red stripes. The apple appears to have a smooth texture, and its surface is shiny. There are no visible bruises or blemishes on the apple's surface. The apple has a small stem attached to the top. \n\nThe apple is not in packaging. There is no visible text or branding on the apple itself. The background of the image is out of focus, but it appears to be a gray surface, possibly concrete or asphalt, with some greenery visible on either side. The overall condition of the apple appears to be fresh and ripe.",
+      "reasoning": "The product title and description accurately represent the image of a single, fresh, and ripe apple with a predominantly red skin, yellow highlights, and a smooth texture, matching the details provided in the product information."
     },
-    "updatedAt": "2025-10-19T17:43:38.725Z"
+    "updatedAt": "2025-10-22T19:41:51.992Z"
   }
 ]

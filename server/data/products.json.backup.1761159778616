@@ -342,26 +342,6 @@
     }
   },
   {
-    "name": "banana",
-    "description": "banana banana banana",
-    "price": 4100,
-    "category": "Fruits",
-    "stock": 10,
-    "imageUrl": "/uploads/1760887753383-43adu3tay1u.jpeg",
-    "validationStatus": "rejected",
-    "id": "mgxv3qvt-6cldm4sva",
-    "createdAt": "2025-10-19T15:29:14.201Z",
-    "validationResult": {
-      "score": 0,
-      "issues": [
-        "Title does not match the image content",
-        "Description contains irrelevant information (banana) instead of apple"
-      ],
-      "imageDescription": "Here's a detailed and objective description of the product image:\n\n**Product:** The product is a single apple.\n\n**Color:** The apple is predominantly a deep red color, with areas of yellowish-orange visible, creating a mottled or speckled effect across its surface.\n\n**Texture:** The surface of the apple appears smooth and slightly shiny. There are no visible blemishes or imperfections.\n\n**Condition:** The apple appears to be in good condition.\n\n**Packaging:** There is no visible packaging. The apple is presented as a standalone item.\n\n**Visible Text/Branding:** There is no visible text or branding on the apple.\n",
-      "reasoning": "The title and description do not accurately represent the product in the image. The title mentions 'banana' which is not present in the image, and the description contains multiple instances of 'banana' despite showing an apple."
-    }
-  },
-  {
     "name": "red apple",
     "description": "a fruit called  apple and its color is red",
     "price": 10,
@@ -379,25 +359,22 @@
     }
   },
   {
-    "name": "apple",
-    "description": "new bananas healthy and ready to be eaten",
-    "price": 41412,
-    "category": "Fruits",
+    "name": "banana",
+    "description": "ffffffffffffffffffffffffff",
+    "price": 10,
+    "category": "Tropical",
     "stock": 10,
-    "imageUrl": "/uploads/1760891375310-0m7unbnyqp8f.png",
+    "imageUrl": "/uploads/1761159495283-rxygdolqmts.jpeg",
     "validationStatus": "rejected",
-    "id": "mgxx9doy-p2gyzo6yx",
-    "createdAt": "2025-10-19T16:29:36.274Z",
+    "id": "mh2cw4fx-5pr7wor9l",
+    "createdAt": "2025-10-22T18:58:16.317Z",
     "validationResult": {
       "score": 0,
       "issues": [
-        "Title does not match the image content",
-        "Description contains multiple instances of 'apple', but the image shows bananas",
-        "No packaging or branding visible in the image, which is inconsistent with a packaged product"
+        "Product title 'banana' does not match the image which shows an apple"
       ],
-      "imageDescription": " The product in the image is a bunch of ripe bananas with a yellow hue indicating their stage of ripeness. They are whole and show no signs of damage or decay. There are six bananas clearly visible, arranged in a line against a white background that highlights their vibrant color. The bananas have a smooth texture typical for fruits and vegetables, and there is no packaging visible in the image, indicating they may be ready for consumption or sale. No text or branding is discernible from this image. ",
-      "reasoning": "The title and description do not accurately represent the image content. The image clearly shows ripe bananas, while the title and description suggest an apple. Additionally, the lack of packaging or branding in the image contradicts the expectation for a packaged product."
-    },
-    "updatedAt": "2025-10-19T16:33:31.765Z"
+      "imageDescription": " The image shows a single apple sitting atop a blurred surface that appears to be a sidewalk or ground with a gravelly texture. The apple itself has a vibrant red hue, indicating it is ripe and fresh. There is a visible stem on the top of the apple, which suggests its natural state. The condition of the apple seems pristine, without any noticeable bruises or blemishes. No visible text or branding is present in the image. The style of the photo is a close-up product shot with a shallow depth of field, emphasizing the apple while subtly blurring the background to draw focus on the item. ",
+      "reasoning": "The product title provided ('banana') is incorrect and does not correspond to the image, which depicts a single apple."
+    }
   }
 ]

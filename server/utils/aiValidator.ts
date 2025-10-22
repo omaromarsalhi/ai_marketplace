@@ -2,26 +2,42 @@ import { Ollama } from 'ollama'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
-// Initialize Ollama client for Ollama Cloud
-const ollamaHost = 'https://api.ollama.cloud'
+// Configuration
 const ollamaApiKey = process.env.OLLAMA_API_KEY
-const geminiApiKey = process.env.GEMINI_API_KEY
-const visionProvider = process.env.VISION_PROVIDER || 'gemini' // 'gemini' or 'ollama'
+const groqApiKey = process.env.GROQ_API_KEY
 
-// Check if using cloud or local
-const isUsingCloud = true
+// Model configuration via environment variables
+const ollamaTextModel = process.env.OLLAMA_CLOUD_TEXT_MODEL || 'qwen2.5:3b'
+const ollamaVisionModel = process.env.OLLAMA_CLOUD_VISION_MODEL || 'llava:7b-v1.6-mistral-q2_K'
+const groqTextModel = process.env.GROQ_TEXT_MODEL || 'llama3-8b-8192'
+const groqVisionModel = process.env.GROQ_VISION_MODEL || 'qwen2-vl-7b-instruct'
 
-console.log(`🤖 Using Ollama Cloud: ${ollamaHost}`)
+// Provider selection
+const visionProvider = process.env.VISION_PROVIDER || 'gemini'
+const textProvider = process.env.TEXT_PROVIDER || 'ollama'
+
+// Ollama Cloud configuration
+const ollamaHost = 'https://api.ollama.cloud'
+const ollamaHeaders: Record<string, string> = {}
+if (ollamaApiKey) {
+  ollamaHeaders['Authorization'] = `Bearer ${ollamaApiKey}`
+}
+
+console.log(`🤖 Ollama Provider: CLOUD`)
+console.log(`🌐 Ollama Host: ${ollamaHost}`)
 console.log(`🔮 Vision Provider: ${visionProvider.toUpperCase()}`)
-console.log(`🔮 Gemini API Key: ${geminiApiKey ? 'Configured' : 'Not configured'}`)
+console.log(`📝 Text Provider: ${textProvider.toUpperCase()}`)
+console.log(`📝 Text Model (Ollama): ${ollamaTextModel}`)
+console.log(`🖼️  Vision Model (Ollama): ${ollamaVisionModel}`)
+console.log(`⚡ Text Model (Groq): ${groqTextModel}`)
+console.log(`👁️ Vision Model (Groq): ${groqVisionModel}`)
 console.log(`🔑 Ollama API Key: ${ollamaApiKey ? 'Configured' : 'Not configured'}`)
+console.log(`🔑 Groq API Key: ${groqApiKey ? 'Configured' : 'Not configured'}`)
 
-// Initialize Ollama Cloud client according to docs
+// Initialize Ollama client
 const ollama = new Ollama({
   host: ollamaHost,
-  headers: {
-    'Authorization': `Bearer ${ollamaApiKey}`
-  }
+  headers: ollamaHeaders
 })
 
 export interface ValidationResult {
@@ -33,85 +49,7 @@ export interface ValidationResult {
 }
 
 /**
- * Describe the image using Gemini vision model
- */
-async function describeImageWithGemini(imageUrl: string): Promise<string> {
-  console.log('🔍 Analyzing image with Google Gemini vision model...')
-  
-  if (!geminiApiKey) {
-    throw new Error('Gemini API key is not configured. Please set GEMINI_API_KEY in your .env file')
-  }
-  
-  let base64Image: string
-  let mimeType: string = 'image/jpeg'
-  
-  // Check if the URL is a relative path (local file)
-  if (imageUrl.startsWith('/')) {
-    // It's a relative path, read from file system
-    const filePath = join(process.cwd(), 'public', imageUrl)
-    console.log(`📁 Reading local file: ${filePath}`)
-    const fileBuffer = await readFile(filePath)
-    base64Image = fileBuffer.toString('base64')
-    
-    // Detect mime type from file extension
-    if (filePath.endsWith('.png')) mimeType = 'image/png'
-    else if (filePath.endsWith('.webp')) mimeType = 'image/webp'
-    else if (filePath.endsWith('.gif')) mimeType = 'image/gif'
-  } else {
-    // It's a full URL, fetch it
-    console.log(`🌐 Fetching remote image: ${imageUrl}`)
-    const imageResponse = await fetch(imageUrl)
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to fetch image: ${imageResponse.statusText}`)
-    }
-    const imageBuffer = await imageResponse.arrayBuffer()
-    base64Image = Buffer.from(imageBuffer).toString('base64')
-    mimeType = imageResponse.headers.get('content-type') || 'image/jpeg'
-  }
-  
-  // Use Google Gemini vision model to describe the image
-  console.log('🤖 Sending image to Google Gemini...')
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            {
-              text: 'Describe this product image in detail. Focus on: what the product is, its color, texture, condition, packaging (if any), and any visible text or branding. Be specific and objective.'
-            },
-            {
-              inline_data: {
-                mime_type: mimeType,
-                data: base64Image
-              }
-            }
-          ]
-        }]
-      })
-    }
-  )
-  
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Gemini API error: ${response.status} - ${error}`)
-  }
-  
-  const data = await response.json()
-  const description = data.candidates?.[0]?.content?.parts?.[0]?.text
-  
-  if (!description) {
-    throw new Error('No description returned from Gemini')
-  }
-  
-  console.log('✅ Image description generated by Gemini')
-  console.log('📝 Gemini Description:', description)
-  return description
-}
+ * Describe the image using Ollama vision model
 
 /**
  * Describe the image using Ollama LLaVA vision model
@@ -119,6 +57,7 @@ async function describeImageWithGemini(imageUrl: string): Promise<string> {
 async function describeImageWithOllama(imageUrl: string): Promise<string> {
   console.log('🔍 Analyzing image with Ollama LLaVA vision model...')
   
+  // Check configuration
   if (!ollamaApiKey) {
     throw new Error('Ollama API key is not configured. Please set OLLAMA_API_KEY in your .env file')
   }
@@ -145,8 +84,12 @@ async function describeImageWithOllama(imageUrl: string): Promise<string> {
   
   // Use Ollama LLaVA vision model to describe the image
   console.log('🤖 Sending image to Ollama LLaVA...')
+  
+  // Use configured vision model
+  const visionModel = ollamaVisionModel
+  
   const response = await ollama.generate({
-    model: 'llava:7b-v1.6-mistral-q2_K',
+    model: visionModel,
     prompt: 'Describe this product image in detail. Focus on: what the product is, its color, texture, condition, packaging (if any), and any visible text or branding. Be specific and objective.',
     images: [base64Image],
     stream: false
@@ -158,14 +101,15 @@ async function describeImageWithOllama(imageUrl: string): Promise<string> {
 }
 
 /**
- * Describe the image using the configured vision provider
+ * Describe the image using the configured vision provider (Ollama or Groq)
  */
 async function describeImage(imageUrl: string): Promise<string> {
   try {
-    if (visionProvider === 'ollama') {
-      return await describeImageWithOllama(imageUrl)
+    if (visionProvider === 'groq') {
+      return await describeImageWithGroq(imageUrl)
     } else {
-      return await describeImageWithGemini(imageUrl)
+      // Default to Ollama
+      return await describeImageWithOllama(imageUrl)
     }
   } catch (error: any) {
     console.error('❌ Error describing image:', error.message)
@@ -175,6 +119,171 @@ async function describeImage(imageUrl: string): Promise<string> {
       throw new Error(`${visionProvider.toUpperCase()} API key not configured. Check your .env file`)
     }
     throw new Error(`Failed to analyze image: ${error.message}`)
+  }
+}
+
+/**
+ * Generate text using Groq
+ */
+async function generateTextWithGroq(prompt: string): Promise<string> {
+  if (!groqApiKey) {
+    throw new Error('Groq API key not configured')
+  }
+
+  console.log('🚀 Generating text with Groq...')
+  
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: groqTextModel,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1000
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.text()
+      throw new Error(`Groq API error: ${response.status} - ${errorData}`)
+    }
+
+    const data = await response.json()
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response from Groq API')
+    }
+
+    const result = data.choices[0].message.content
+    console.log('✅ Text generated by Groq')
+    return result
+    
+  } catch (error: any) {
+    console.error('❌ Error with Groq:', error.message)
+    throw new Error(`Groq generation failed: ${error.message}`)
+  }
+}
+
+/**
+ * Describe image using Groq vision model
+ */
+async function describeImageWithGroq(imageUrl: string): Promise<string> {
+  if (!groqApiKey) {
+    throw new Error('Groq API key not configured')
+  }
+
+  console.log('🚀 Analyzing image with Groq vision model...')
+  
+  try {
+    let imageUrlOrBase64: string
+    
+    // Check if the URL is a relative path (local file)
+    if (imageUrl.startsWith('/')) {
+      // It's a relative path, read from file system and convert to base64
+      const filePath = join(process.cwd(), 'public', imageUrl)
+      console.log(`📁 Reading local file for Groq: ${filePath}`)
+      const fileBuffer = await readFile(filePath)
+      const base64Image = fileBuffer.toString('base64')
+      
+      // Determine the image type from the file extension
+      const extension = imageUrl.split('.').pop()?.toLowerCase()
+      const mimeType = extension === 'png' ? 'image/png' : 
+                       extension === 'jpg' || extension === 'jpeg' ? 'image/jpeg' : 
+                       extension === 'gif' ? 'image/gif' : 
+                       extension === 'webp' ? 'image/webp' : 
+                       'image/jpeg' // default
+      
+      imageUrlOrBase64 = `data:${mimeType};base64,${base64Image}`
+      console.log('✅ Image converted to base64 for Groq')
+    } else {
+      // It's a full URL, use it directly
+      console.log(`🌐 Using remote image URL: ${imageUrl}`)
+      imageUrlOrBase64 = imageUrl
+    }
+    
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: groqVisionModel,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { 
+                type: 'text', 
+                text: 'Describe this product image in detail. Focus on: what the product is, its color, texture, condition, packaging (if any), and any visible text or branding. Be specific and objective.' 
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageUrlOrBase64
+                }
+              }
+            ]
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1000
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.text()
+      throw new Error(`Groq Vision API error: ${response.status} - ${errorData}`)
+    }
+
+    const data = await response.json()
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response from Groq Vision API')
+    }
+
+    const description = data.choices[0].message.content
+    console.log('✅ Image description generated by Groq')
+    console.log('📝 Groq Vision Description:', description)
+    return description
+    
+  } catch (error: any) {
+    console.error('❌ Error with Groq Vision:', error.message)
+    throw new Error(`Groq vision analysis failed: ${error.message}`)
+  }
+}
+
+/**
+ * Generate text using the configured text provider (Groq or Ollama)
+ */
+async function generateText(prompt: string): Promise<string> {
+  try {
+    if (textProvider === 'groq') {
+      return await generateTextWithGroq(prompt)
+    } else {
+      // Default to Ollama
+      const response = await ollama.generate({
+        model: ollamaTextModel,
+        prompt,
+        stream: false,
+        options: {
+          temperature: 0.7
+        }
+      })
+      return response.response
+    }
+  } catch (error: any) {
+    console.error('❌ Error generating text:', error.message)
+    throw new Error(`Failed to generate text: ${error.message}`)
   }
 }
 
@@ -188,7 +297,7 @@ async function validateProductData(
   imageDescription: string
 ): Promise<{ isValid: boolean; score: number; issues: string[]; reasoning: string }> {
   try {
-    console.log('🤖 Validating product data with Llama 3.2 (Ollama Cloud)...')
+    console.log(`🤖 Validating product data with ${textProvider.toUpperCase()}...`)
     
     const prompt = `You are a product validation AI. Your job is to verify if the product information matches the image.
 
@@ -221,18 +330,11 @@ Respond in this EXACT JSON format (no additional text):
 
 If issues array is empty and everything matches perfectly, set issues to empty array [].`
 
-    // Use llama3.2:latest - available on your Ollama Cloud account
-    const response = await ollama.generate({
-      model: 'llama3.2:latest',
-      prompt,
-      stream: false,
-      options: {
-        temperature: 0.3, // Lower temperature for more consistent outputs
-      }
-    })
+    // Use the configured text provider
+    const response = await generateText(prompt)
     
     // Parse the AI response
-    const jsonMatch = response.response.match(/\{[\s\S]*\}/)
+    const jsonMatch = response.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       throw new Error('Invalid AI response format')
     }
@@ -243,11 +345,6 @@ If issues array is empty and everything matches perfectly, set issues to empty a
     return result
   } catch (error: any) {
     console.error('❌ Error validating product:', error.message)
-    
-    // Provide specific error messages
-    if (error.message.includes('not found')) {
-      throw new Error('Llama 3.2 model not available. Check your OLLAMA_API_KEY or available models')
-    }
     throw new Error(`Failed to validate product: ${error.message}`)
   }
 }
@@ -295,44 +392,32 @@ export async function checkOllamaHealth(): Promise<boolean> {
  */
 export async function checkRequiredModels(): Promise<{ vision: boolean; text: boolean; message: string }> {
   try {
-    // Check vision provider based on configuration
-    let hasVision = false
-    if (visionProvider === 'ollama') {
-      // For Ollama vision, check if API key is available
-      hasVision = !!ollamaApiKey
-    } else {
-      // For Gemini vision, check if API key is available
-      hasVision = !!geminiApiKey
-    }
+    // Check vision provider configuration (Ollama or Groq)
+    const hasVision = visionProvider === 'groq' ? !!groqApiKey : !!ollamaApiKey
     
-    // For Ollama Cloud text model, we just need the API key - cloud models are always available
-    const hasText = !!ollamaApiKey && isUsingCloud
-    
+    // For text models, check if either Ollama or Groq API key is available
+    const hasText = !!ollamaApiKey || !!groqApiKey
+
     let message = ''
     if (!hasVision && !hasText) {
-      if (visionProvider === 'ollama') {
-        message = 'Missing Ollama API key for both vision and text. Set OLLAMA_API_KEY in your .env file'
-      } else {
-        message = 'Missing Gemini API key and Ollama Cloud API key. Set both in your .env file'
-      }
+      message = 'Missing API keys for both vision and text. Set appropriate API keys in your .env file'
     } else if (!hasVision) {
-      if (visionProvider === 'ollama') {
-        message = 'Missing Ollama API key for vision. Set OLLAMA_API_KEY in your .env file'
-      } else {
-        message = 'Missing Gemini API key for vision. Set GEMINI_API_KEY in your .env file'
-      }
+      const visionProviderName = visionProvider === 'groq' ? 'Groq' : 'Ollama'
+      const visionKeyName = visionProvider === 'groq' ? 'GROQ_API_KEY' : 'OLLAMA_API_KEY'
+      message = `Missing ${visionProviderName} API key for vision. Set ${visionKeyName} in your .env file`
     } else if (!hasText) {
-      message = 'Missing Ollama Cloud API key for text validation. Set OLLAMA_API_KEY in your .env file'
+      message = 'Missing API keys for text generation. Set either OLLAMA_API_KEY or GROQ_API_KEY in your .env file'
     } else {
-      const visionMsg = visionProvider === 'ollama' ? 'Ollama LLaVA' : 'Gemini'
-      message = `✅ All required models are available (${visionMsg} + Ollama Cloud)`
+      const visionProviderName = visionProvider === 'groq' ? 'Groq' : 'Ollama'
+      const textProviderName = textProvider === 'groq' ? 'Groq' : 'Ollama'
+      message = `✅ All required models are available (${visionProviderName} Vision + ${textProviderName} Text)`
     }
     
     return { vision: hasVision, text: hasText, message }
   } catch (error) {
     // If there's any error, check what's available
-    const hasVision = visionProvider === 'ollama' ? !!ollamaApiKey : !!geminiApiKey
-    const hasText = !!ollamaApiKey
+    const hasVision = visionProvider === 'groq' ? !!groqApiKey : !!ollamaApiKey
+    const hasText = !!ollamaApiKey || !!groqApiKey
     return { 
       vision: hasVision, 
       text: hasText, 
@@ -340,3 +425,6 @@ export async function checkRequiredModels(): Promise<{ vision: boolean; text: bo
     }
   }
 }
+
+// Export the generateText function for use in other modules
+export { generateText }

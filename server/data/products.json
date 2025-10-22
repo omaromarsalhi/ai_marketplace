@@ -357,5 +357,22 @@
       "imageDescription": "Here is a detailed description of the product image:\n\n**Product:** The product is a single apple.\n\n**Color:** The apple displays a blend of red and yellow coloring. The red is dominant, with mottled patches and streaks of yellow visible throughout the skin.\n\n**Texture:** The texture of the apple appears smooth and slightly shiny. It has a natural, unblemished appearance.\n\n**Condition:** The apple appears to be in good condition, with no visible bruising or damage. It has a firm, round shape.\n\n**Packaging:** There is no visible packaging around the apple. It is presented as a standalone item.\n\n**Text/Branding:** There is no visible text or branding on the apple or in the surrounding area.\n",
       "reasoning": "The title 'red apple' accurately represents the image content. The description 'a fruit called apple and its color is red' also matches the image, as it describes the dominant red color with yellow patches. No inconsistencies were found."
     }
+  },
+  {
+    "name": "Fresh Red Apple",
+    "description": "Indulge in the crisp sweetness of our fresh red apple, carefully selected to provide you with a healthy and delicious snack. With its vibrant red skin and yellow highlights, this apple is not only a treat for the eyes but also a great source of fiber and antioxidants. The slightly shiny texture and visible lenticels ensure that the apple is fresh and of high quality. Enjoy it on its own as a quick snack or add it to your favorite salad or dessert for a burst of flavor and nutrition.",
+    "price": 10,
+    "category": "Fruits",
+    "stock": 10,
+    "imageUrl": "/uploads/1761162926616-tbj4b6482jf.jpeg",
+    "validationStatus": "approved",
+    "id": "mh2exyqv-061sefpgq",
+    "createdAt": "2025-10-22T19:55:41.479Z",
+    "validationResult": {
+      "score": 90,
+      "issues": [],
+      "imageDescription": "The product image depicts a single apple. \n\nThe apple is predominantly red with yellow highlights and appears to have a smooth texture. The surface of the apple shows some minor blemishes or speckles. The apple's condition appears to be fresh.\n\nThere is no visible packaging. \n\nThe apple has a small stem attached to the top. \n\nThere is no visible text or branding on the apple. \n\nThe background of the image is out of focus but appears to be a gray surface, possibly concrete or asphalt, with some greenery visible on either side.",
+      "reasoning": "The product title and description accurately represent the image of a fresh red apple with yellow highlights, smooth texture, and minor blemishes, with no visible packaging or branding."
+    }
   }
 ]

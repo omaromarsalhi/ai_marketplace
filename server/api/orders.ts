@@ -1,9 +1,11 @@
+// server/api/orders.ts
 import { createError } from 'h3'
 import { readData, writeData } from '~/server/utils/storage'
 import { createId } from '~/server/utils/ids'
 import type { Order, OrderData } from '~/types/order'
 
 const ORDERS_FILE = 'orders.json'
+const PRODUCTS_FILE = 'products.json'
 
 export default defineEventHandler(async (event) => {
   const method = event.method
@@ -13,7 +15,6 @@ export default defineEventHandler(async (event) => {
     // GET /api/orders - List all orders
     if (method === 'GET' && !id) {
       const data = await readData<any>(ORDERS_FILE)
-      // Handle case where data is empty or doesn't have the right structure
       if (!data || !Array.isArray(data) || data.length === 0 || !data[0] || !data[0].orders) {
         return { orders: [] }
       }
@@ -45,9 +46,29 @@ export default defineEventHandler(async (event) => {
       const body = await readBody(event)
       const now = new Date().toISOString()
       
+      // Read products to calculate total amount
+      const productsData = await readData<any>(PRODUCTS_FILE)
+      const products = Array.isArray(productsData) ? productsData : []
+
+      // Calculate total amount based on product prices
+      let totalAmount = 0
+      const productsWithPrices = body.products.map((item: any) => {
+        const product = products.find((p: any) => p.id === item.productId)
+        const price = product?.price || 0
+        const itemTotal = price * item.quantity
+        totalAmount += itemTotal
+        
+        return {
+          ...item,
+          price: price
+        }
+      })
+
       const order: Order = {
         id: createId(),
         ...body,
+        products: productsWithPrices,
+        totalAmount: parseFloat(totalAmount.toFixed(2)),
         createdAt: now,
         updatedAt: now,
         status: 'pending'

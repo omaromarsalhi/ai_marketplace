@@ -38,6 +38,7 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (only available server-side)
+    geminiApiKey: process.env.GEMINI_API_KEY,// Add this line
     apiSecret: '',
     
     // Public keys (exposed to client)

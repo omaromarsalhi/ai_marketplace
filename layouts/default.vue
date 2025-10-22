@@ -57,6 +57,9 @@
     
     <main class="flex-1 bg-gradient-to-br from-green-50 to-emerald-50">
       <slot />
+      
+      <!-- AI Order Chat Assistant -->
+      <OrderChat />
     </main>
     
     <footer class="mt-16 bg-gradient-to-r from-gray-100 to-gray-200 border-t-4 border-green-500">
@@ -68,3 +71,7 @@
     </footer>
   </div>
 </template>
+
+<script setup lang="ts">
+
+</script>
